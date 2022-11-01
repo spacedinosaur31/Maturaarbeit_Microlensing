@@ -1,11 +1,10 @@
-import numpy as np
-import os
-import time
-n_max_chi_value = 3 #because mean of standard deviation is approx. 1.5 
-#-> that's the noise of a constant source so same noise around ML theory function too
+import numpy as np # für Mathematik
+import os # operating system -> für Kommunikation mit dem System
+import time # um die Zeit an einem bestimmten Zeitpunkt erhalten zu können - Geschwindigkeit messen
+n_max_chi_value = 3 # bei anderen Wissenschaftlern verwendeter Maximalwert für Chi
 
 # FUNCTIONS
-def f_ML_theo(n_d, n_umin, n_tE, n_I, n_t_max): #theoretische ML-Funktion, input = time-array, output = mag-array
+def f_ML_theo(n_d, n_umin, n_tE, n_I, n_t_max): #theoretische ML-Funktion, input = time-Wert (integer), output = mag-Wert (float)
     #umin => between 0 and 1 - the smaller, the bigger the amplitude
     #tE => duration of Event - the bigger, the wider the curve
     #I => intensity I = (light intensity)/Area of star without amplification
@@ -17,7 +16,7 @@ def f_ML_theo(n_d, n_umin, n_tE, n_I, n_t_max): #theoretische ML-Funktion, input
     else: n_M = -10 #if umin = 0 and d = t0, amplitude theoretically becomes infinite 
     return n_M
 
-def f_ML_theo_for_array(a_t, n_umin, n_tE, n_I, n_t_max):
+def f_ML_theo_for_array(a_t, n_umin, n_tE, n_I, n_t_max): # Anwendung der f_ML_theo()-Funktion auf alle Elemente eines t-arrays
     a_theo_mag = []
     for n_t in a_t:
         a_theo_mag.append(f_ML_theo(n_t, n_umin, n_tE, n_I, n_t_max))
@@ -25,21 +24,26 @@ def f_ML_theo_for_array(a_t, n_umin, n_tE, n_I, n_t_max):
 
 
 def fit(f_ML_theo_for_array, a_x_t, a_y_mag): # returns number: optimal difference and array: (umin, tE, I, t_max)
-    a_differences = [] 
-    a_a_params = []
+    a_differences = [] # hier werden alle Chi-Werte abgespeichert und dann das Minimum herausgesucht
+    a_a_params = [] # Parameterwerte des Minimums von oben werden danach als Output mitgegeben
+    
+    
+    
     # Limits (numbers) - parameters beyond these are not sensible
     
+    # es werden nur Werte innerhalb der Existierenden Werte eingesetzt, da etwas anderes ohnehin sinnlos wäre (z.B. ein I von 10**(18/-2.5), obwohl tiefster mag-Wert =20
     n_min_mag = min(a_y_mag)
     n_max_mag = max(a_y_mag)
     
     n_min_t = int(min(a_x_t))
     n_max_t = int(max(a_x_t))
     
+    # Microlensing-Events mit tE < 10 oder tE > Messdauer können schwer oder nicht erkannt werden, da die Funktion im Rauschen verschwindet oder zu flach ist
     n_min_tE = 10
     n_max_tE = n_max_t - n_min_t
     n_steps_umin = 5  # range()-function takes ints only -> multiplies value do eliminate decimal stuff and divides back again
     n_steps_mag = 5
-    start_fit = time.time()
+    start_fit = time.time() # gibt genauen Zeitpunkt des Lesens der Zeile wieder
     for n_umin in [(1/n_steps_umin)*x for x in range(1,n_steps_umin)]: # umin has to be between 0 and 1 but range doesn't work for floats - make list of ints and divide again
         for n_tE in range(n_min_tE, n_max_tE, 10):
             for n_mag in [(1/n_steps_mag)*x for x in range(int(n_steps_mag*n_min_mag), int(n_steps_mag*n_max_mag))]: #for I-calculation, gets converted later
@@ -66,9 +70,9 @@ def fit(f_ML_theo_for_array, a_x_t, a_y_mag): # returns number: optimal differen
                             a_differences.append(chi_squared) # save in list and then calculate minimum 
                             a_a_params.append([n_umin, n_tE, 10**(n_mag/-2.5), n_t_max])
     stop_fit = time.time()
-    print(stop_fit-start_fit)
+    print(stop_fit-start_fit) # Dauer Loop
     n_optimal_difference = min(a_differences)    
-    return [n_optimal_difference, a_a_params[a_differences.index(n_optimal_difference)]]
+    return [n_optimal_difference, a_a_params[a_differences.index(n_optimal_difference)]] # output: Liste
         
 
 class O_indices: #object for indices as "objectid", not as "lc[0]" -> für die Übersichtlichkeit
