@@ -16,8 +16,7 @@ class O_indices: #object for indices as "objectid", not as "lc[0]" -> bessere Ü
 o_indices = O_indices()
 
 a_a_data = np.load("C:\Kanti\Microlensing\Python\some_filtereddata\ztf_000762_zr_c01_q4_dr11.parquet_filtered.npy", allow_pickle=True) # .npy-File aufrufen, da gefilterte Daten so abgespeichert wurden
-# shape of a_data: array(a_LC, n_fitting_difference)
-# # .loc() = Befehl in Pandas, um alle zugehörigen Daten zu gewissem Objekt zu holen 
+# shape of data-array in file if a fitted file: array(a_LC, n_fitting_difference)
 for i in range(len(a_a_data)): # jede Lichtkurve plotten, kann angepasst werden falls File zu gross
     lc = a_a_data[i]
     
