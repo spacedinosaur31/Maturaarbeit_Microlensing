@@ -1,3 +1,4 @@
+# does the same as mergedfilter3.py but without downloading, takes already downloaded files from dir
 import pyarrow.parquet # for accessing .parquet-file
 import numpy as np # math -> numpy = numerical python
 import os #functions for interacting with operating system
