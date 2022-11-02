@@ -50,8 +50,6 @@ def neumann(array):
 
 #Lists 
 lightc_lst = [0 for i in range(LCamount)] # stellt synthetischen Datensatz dar -> pro LC: Liste wie [Index (-> Object-ID), Magnitudenwerte, Zeitpunkte]
-detect_lst_binary = np.zeros(LCamount) # Array gefilterter ML-Events, np.zeros(x) macht Liste mit x Nullen
-truetruth_lst_binary = np.zeros(LCamount) # Array mit tatsächlichen ML-Events -> muss Liste sein, da np.array keine arrays speichern kann aber kein Problem, da bei ZTF kein lclist erzeugt werden muss
 lightc_lst_filtered = [] # Index (wie object ID) wird in Liste eingefügt -> am Schluss gezählt, ob alle Kriterien erfüllt
 
 umin_found = [] 
@@ -66,108 +64,105 @@ skew_noML = []
 neumann_ML = []
 neumann_noML = []
 
+for a in [0.1*x for x in range(-10, 0)]: # in range of sensible parameters
+   for b in 0.1*x for x in range(0, 20)]:
 
-lost = 0
-trap = 0
-found = 0
+      lost = 0
+      trap = 0
+      found = 0
 
 # SYNTHETIC LC GENERATOR + FILTERING -> Produktion künstlicher LC -> random ML-Events oder nicht 
-for i in range(LCamount):   
-    ML_yesorno = random.randint(0, probability) #Wahrscheinlichkeit von 1/40
-    magpointamount = random.randint(magpointamount_min, 100)
-    if ML_yesorno == 1: #falls Microlensing-Event
-        
-     
-        t = np.zeros(magpointamount) # (start, end, Anz. Striche zwischen start und end) -> x-Achse
-        # freie Parameter hängen von t ab -> verändern sich mit der Zeit -> Körper bewegen sich
-        mag = np.zeros(magpointamount)
-        umin = random.random()
-        tE = random.randint(1, surveylength) # Zeitdauer, um Einstein-Radius zurückzulegen
-        for x in range(magpointamount):
-            t[x] = random.randint(-(1/2)*surveylength, (1/2)*surveylength)
-        np.ndarray.sort(t)
-        for x in range(magpointamount):  # Helligkeit A abhängig von u, u abhängig t
-            M = theo(t[x], umin, tE)  + random.gauss(0, mean_std) # bei beiden Gauss-Rauschen machen
-            mag[x] = M
-            lc_skew_value = skew(mag)
-            lc_neumann_value = neumann(mag)
-            
-        skew_ML.append(lc_skew_value)
-        neumann_ML.append(lc_neumann_value)
+      for i in range(LCamount):   
+          ML_yesorno = random.randint(0, probability) #Wahrscheinlichkeit von 1/40
+          magpointamount = random.randint(magpointamount_min, 100)
+          if ML_yesorno == 1: #falls Microlensing-Event
 
-        lightc_lst[i] = np.array([i, t, mag, umin, tE, lc_skew_value, lc_neumann_value], dtype = object)
 
-        # FILTER HERE:
-        if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
-            found += 1
-            umin_found.append(umin)
-            tE_found.append(tE)
-            
-        else:
-            lost += 1
-            umin_lost.append(umin)
-            tE_lost.append(tE)
-         
+              t = np.zeros(magpointamount) # (start, end, Anz. Striche zwischen start und end) -> x-Achse
+              # freie Parameter hängen von t ab -> verändern sich mit der Zeit -> Körper bewegen sich
+              mag = np.zeros(magpointamount)
+              umin = random.random()
+              tE = random.randint(1, surveylength) # Zeitdauer, um Einstein-Radius zurückzulegen
+              for x in range(magpointamount):
+                  t[x] = random.randint(-(1/2)*surveylength, (1/2)*surveylength)
+              np.ndarray.sort(t)
+              for x in range(magpointamount):  # Helligkeit A abhängig von u, u abhängig t
+                  M = theo(t[x], umin, tE)  + random.gauss(0, mean_std) # bei beiden Gauss-Rauschen machen
+                  mag[x] = M
+                  lc_skew_value = skew(mag)
+                  lc_neumann_value = neumann(mag)
 
-        # plt.figure() #make coordinate system
-        # plt.plot(t, mag,".", color = "red")#t,mag = lists! -> A(t)+0.2*random -> adds random number to whole list -> for loop to handle each value separately!
+              skew_ML.append(lc_skew_value)
+              neumann_ML.append(lc_neumann_value)
+              skew_neumann_combinations.append([lc_skew_value, lc_neumann_value])
 
-    else: 
-        
-       
-        t = np.zeros(magpointamount) # (start, end, Anz. Striche zwischen start und end) -> x-Achse
-        # freie Parameter hängen von t ab -> verändern sich mit der Zeit -> Körper bewegen sich
-        mag = np.zeros(magpointamount)
-        for x in range(magpointamount):
-            t[x] = random.randint(-(1/2)*surveylength, (1/2)*surveylength)
-        np.ndarray.sort(t)
-        for x in range(magpointamount):
-            M = mean_mag + random.gauss(0, mean_std)
-            mag[x] = M
-            lc_skew_value = skew(mag)
-            lc_neumann_value = neumann(mag)
-            
-        skew_noML.append(lc_skew_value)
-        neumann_noML.append(lc_neumann_value)
-        
-        lightc_lst[i] = np.array([i, t, mag, None, None, lc_skew_value, lc_neumann_value], dtype = object)
+              lightc_lst[i] = np.array([i, t, mag, umin, tE, lc_skew_value, lc_neumann_value], dtype = object)
 
-        # FILTER HERE:
-        if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
-            trap += 1
-      
+              # FILTER HERE:
+              if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
+                  found += 1
+                  umin_found.append(umin)
+                  tE_found.append(tE)
 
+              else:
+                  lost += 1
+                  umin_lost.append(umin)
+                  tE_lost.append(tE)
+
+
+              # plt.figure() #make coordinate system
+              # plt.plot(t, mag,".", color = "red")#t,mag = lists! -> A(t)+0.2*random -> adds random number to whole list -> for loop to handle each value separately!
+
+          else: 
+
+
+              t = np.zeros(magpointamount) # (start, end, Anz. Striche zwischen start und end) -> x-Achse
+              # freie Parameter hängen von t ab -> verändern sich mit der Zeit -> Körper bewegen sich
+              mag = np.zeros(magpointamount)
+              for x in range(magpointamount):
+                  t[x] = random.randint(-(1/2)*surveylength, (1/2)*surveylength)
+              np.ndarray.sort(t)
+              for x in range(magpointamount):
+                  M = mean_mag + random.gauss(0, mean_std)
+                  mag[x] = M
+                  lc_skew_value = skew(mag)
+                  lc_neumann_value = neumann(mag)
+
+              skew_noML.append(lc_skew_value)
+              neumann_noML.append(lc_neumann_value)
+
+              lightc_lst[i] = np.array([i, t, mag, None, None, lc_skew_value, lc_neumann_value], dtype = object)
+
+              # FILTER HERE:
+              if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
+                  trap += 1
+
+      foundlostrelations_list.append(found/((lost + 1)*(trap + 1)
         # plt.figure() # make coordinate system
         # plt.plot(t, mag,".", color = "red")#t,a = lists! -> A(t)+0.2*random -> adds random number to whole list -> for loop to handle each value separately!
-x = [0.1*x for x in range(10*int(min(skew_ML)), 12)]
-y = []
 
-for i in x:
-    y.append(-0.3*i + 1.1)
+ #for plotting after finished grid search
+#x = [0.1*x for x in range(10*int(min(skew_ML)), 12)]
+#y = []
+
+#for i in x:
+#    y.append(-0.3*i + 1.1)
     
 
 #umin-tE-Diagramm:
-plt.figure()
-plt.plot(tE_lost, umin_lost, ".", color = "red")
-plt.plot(tE_found, umin_found, ".", color = "green")
-plt.xlabel("tE")
-plt.ylabel("umin")
-plt.show()
+#plt.figure()
+#plt.plot(tE_lost, umin_lost, ".", color = "red")
+#plt.plot(tE_found, umin_found, ".", color = "green")
+#plt.xlabel("tE")
+#plt.ylabel("umin")
+#plt.show()
 
 # skewness-neumann-diagramm
-plt.figure()
-plt.plot(skew_ML, neumann_ML, ".", color = "blue")
-plt.plot(skew_noML, neumann_noML, ".", color = "red")
-plt.plot(x, y, "-", color = "black")
-plt.xlabel("Skewness")
-plt.ylabel("Von-Neumann-Statistik")
-plt.show()
-    # if np.count_nonzero(detect_lst_binary == 1) != 0: #wenn kein sog "Fehlversuch"
-    #     print("verlorene ML: ", lost)
-    #     print("scheinbare ML: ", trap)
-    #     print("gefundene ML: ", found)
-    #     print("skew ", max_skew, "neumann: ", max_neumann,"the bigger the better the filter: ", found/((lost + 1)*(trap+1))) # -> the bigger this value, the better the filter, trap+1 because otherwise /zero
-    #     # print(truetruth_lst_binary)
-    #     # print(detect_lst_binary)
-# else:
-#         print("Noch nicht verstandener scheinbarer Fehlversuch. Nochmal ausführen bis es klappt.")
+#plt.figure()
+#plt.plot(skew_ML, neumann_ML, ".", color = "blue")
+#plt.plot(skew_noML, neumann_noML, ".", color = "red")
+#plt.plot(x, y, "-", color = "black")
+#plt.xlabel("Skewness")
+#plt.ylabel("Von-Neumann-Statistik")
+#plt.show()
+
