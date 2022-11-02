@@ -136,11 +136,12 @@ for skew_limit in [0.1*x for x in range(-30, 20]: # in range of sensible paramet
               # FILTER HERE:
               if (lc_skew_value <= skew_limit) and (lc_neumann_value <= neumann_limit):
                   trap += 1
-
+                                        
+      param_combinations.append([skew_limit, neumann_limit])
       foundlostrelations_list.append(found/((lost + 1)*(trap + 1)
         # plt.figure() # make coordinate system
         # plt.plot(t, mag,".", color = "red")#t,a = lists! -> A(t)+0.2*random -> adds random number to whole list -> for loop to handle each value separately!
-
+print(max(foundlostrelations), param_combinations[foundlostrelations.index(max(foundlostrelations))]
  #for plotting after finished grid search
 #x = [0.1*x for x in range(10*int(min(skew_ML)), 12)]
 #y = []
