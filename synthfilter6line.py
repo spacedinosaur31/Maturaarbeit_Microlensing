@@ -30,7 +30,7 @@ mean_neumann = 1.6 # circa
 C = 0 # parameter for magnitude-calculation
 LCamount = 1500 # x LCs will be generated -> here: 2000 because 10h time to calculate overnight
 foundlostrelations_list = []
-skew_neumann_combinations = []
+param_combinations = []
 
 # FUNCTIONS
 def theo(t, umin, tE): #theoretische ML-Funktion, returns mag
@@ -94,12 +94,11 @@ for a in [0.1*x for x in range(-10, 0)]: # in range of sensible parameters
 
               skew_ML.append(lc_skew_value)
               neumann_ML.append(lc_neumann_value)
-              skew_neumann_combinations.append([lc_skew_value, lc_neumann_value])
 
               lightc_lst[i] = np.array([i, t, mag, umin, tE, lc_skew_value, lc_neumann_value], dtype = object)
 
               # FILTER HERE:
-              if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
+              if lc_neumann_value <= (a*lc_skew_value + b):
                   found += 1
                   umin_found.append(umin)
                   tE_found.append(tE)
@@ -134,13 +133,15 @@ for a in [0.1*x for x in range(-10, 0)]: # in range of sensible parameters
               lightc_lst[i] = np.array([i, t, mag, None, None, lc_skew_value, lc_neumann_value], dtype = object)
 
               # FILTER HERE:
-              if lc_neumann_value <= (-0.3*lc_skew_value + 1.1):
+              if lc_neumann_value <= (a*lc_skew_value + b):
                   trap += 1
-
+      
+      param_combinations.append([a, b])
       foundlostrelations_list.append(found/((lost + 1)*(trap + 1)
         # plt.figure() # make coordinate system
         # plt.plot(t, mag,".", color = "red")#t,a = lists! -> A(t)+0.2*random -> adds random number to whole list -> for loop to handle each value separately!
-
+                                            
+print(max(foundlostrelations), param_combinations[foundlostrelations.index(max(foundlostrelations))]
  #for plotting after finished grid search
 #x = [0.1*x for x in range(10*int(min(skew_ML)), 12)]
 #y = []
