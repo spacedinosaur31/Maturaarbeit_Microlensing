@@ -63,7 +63,7 @@ skew_noML = []
 
 neumann_ML = []
 neumann_noML = []
-
+#begin grid search 
 for a in [0.1*x for x in range(-10, 0)]: # in range of sensible parameters
    for b in 0.1*x for x in range(0, 20)]:
 
