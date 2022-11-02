@@ -1,11 +1,11 @@
-import pyarrow.parquet
-import pandas 
-import numpy as np
+import pyarrow.parquet # um auf Parquet-File zuzugreifen
+import pandas # um auf Pandas-Dataframe zuzugreifen
+import numpy as np # Mathe
 import os #functions for interacting with operating system
 from scipy.stats import skew
-import json
-import wget
-import gc
+import json # um auf .json-File mit Linkliste zugreifen zu können
+import wget # zum Herunterladen
+import gc # zum Random Access Memory leeren (mit zwischengespeicherten Listen etc. - sonst stürzt der Computer irgendwann ab)
 
 # FUNCTIONS
 def neumann(array):
@@ -34,12 +34,11 @@ class O_indices: #object for indices as "objectid", not as "lc[0]", für Übersi
     clrcoeff = 10
     catflags = 11
 
-# Opening JSON file
+# Opening .json file
 o_file_0 = open('./a_s_url_https_irsa_ipac_caltech_edu_data_ZTF_lc_lc_dr11_0.json')
 o_file_1 = open('./a_s_url__https__irsa_ipac_caltech_edu_data_ZTF_lc_lc_dr11_1.json')
   
-# returns JSON object as 
-# a dictionary
+# returns json object as a dictionary
 a_s_url_0 = json.load(o_file_0)
 a_s_url_1 = json.load(o_file_1)
 a_s_url__merged = a_s_url_0 + a_s_url_1
@@ -78,15 +77,16 @@ class O_indices: #object for indices as "objectid", not as "lc[0]"
     catflags = 11
 o_indices = O_indices()
 
-s_path_current_directory = os.path.dirname(os.path.realpath(__file__))
+s_path_current_directory = os.path.dirname(os.path.realpath(__file__)) # os.path.dirname(x) gibt den Namen des Ordners an, in dem das File mit dem path x gespeichert ist
 
 n_len_a_s_url__merged = len(a_s_url__merged) # 163319
 
-for s_url in a_s_url__merged[12679:]:
+for s_url in a_s_url__merged:
    if "zr" in s_url: #reduces to 69705 
         try:
-            s_urlpath_file = s_url.split("://").pop()
-            s_name_file = s_urlpath_file.split("/").pop()    
+            # .split(x) teilt ein string an der Stelle x in zwei Strings auf, .pop() löscht den ersten Teil
+            s_urlpath_file = s_url.split("://").pop() # z.B. 
+            s_name_file = s_urlpath_file.split("/").pop() #
             wget.download(s_url) # prints dots to show download progress
             
             # process the data
@@ -97,19 +97,18 @@ for s_url in a_s_url__merged[12679:]:
 
             s_path_file = s_path_current_directory + "/" + s_name_file
 
-            o_table = pyarrow.parquet.read_table(
+            o_table = pyarrow.parquet.read_table( 
                 s_path_file    
             )
 
 
-            o_pandas_data_frame = o_table.to_pandas()
+            o_pandas_data_frame = o_table.to_pandas() # make accessible Pandas DataFrame
 
             a_a_all_LC = o_pandas_data_frame.values #makes np.array()
             
 
-        #make filtered list right away
             a_a_LC_vorfilter = np.array([ 
-                a_LC# a_value # 'return value'
+                a_LC# return value
                 for
                 a_LC # variable name in loop
                 in a_a_all_LC  # array name of iterated array
@@ -127,7 +126,7 @@ for s_url in a_s_url__merged[12679:]:
             a_a_LC_hauptfilter = np.array([
                 a_LC for a_LC in a_a_LC_vorfilter
                 if
-                (skew(a_LC[o_indices.mag]) <= (10**((neumann(a_LC[o_indices.mag]) - 1.3)/-0.4) - 1.6)) #params in work
+                (skew(a_LC[o_indices.mag]) <= (10**((neumann(a_LC[o_indices.mag]) - 1.3)/-0.4) - 1.6)) 
             ])
                         
             if len(a_a_LC_hauptfilter) > 0:
@@ -136,6 +135,7 @@ for s_url in a_s_url__merged[12679:]:
             np.save("a_objectids_vorfilter" + s_name_file, a_objectids_vorfilter)
             os.remove(s_path_file) # delete old file
             
+            # delete all to not overwhelm RAM
             del a_a_LC_vorfilter
             del a_objectids_vorfilter
             del a_a_LC_hauptfilter
