@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.stats import skew
-import random
+import random # generate random numbers
 
 """
 Der Datensatz generiert eine Lichtkurvenliste lightc_lst der Anzahl LCamount. Jede Liste enthält 7 Einträge:
@@ -26,7 +26,6 @@ mean_std = 0.15856555  # Mittelwert von 2 fields
 mean_mag = 20.421268  # Mittelwert von 2 fields 
 mean_luminosity = 10**(mean_mag/(-2.5)) # convert magnitude-mean to luminosity-value for multiplication by amplification factor 
 mean_neumann = 1.6 # circa
-C = 0 # parameter for magnitude-calculation
 LCamount = 20 # x LCs will be generated
 lost = 0
 trap = 0
@@ -40,11 +39,11 @@ lightc_lst_filtered = [] # Index (wie object ID) wird in Liste eingefügt -> am 
 skew_lst = np.zeros(LCamount) # Skewness-Werte alles LC
 std_lst = np.zeros(LCamount) # Standardabw-Werte alles LC
 neumann_lst = np.zeros(LCamount)
+# below: for generating plots, not necessary for generating synthetic LC
 umin_lost = []
 tE_lost = []
 umin_found = []
 tE_found = []
-filtered_lst = []
 skew_ML = []
 skew_noML = []
 neumann_ML = []
@@ -157,23 +156,3 @@ print(a_all_MLs)
 # else:
 #         print("Noch nicht verstandener scheinbarer Fehlversuch. Nochmal ausführen bis es klappt.")
 
-# # FITTING
-
-# filteredLCamount = len(lightc_lst_filtered)
-# fittedlst = []
-# maxcov = 1 #maximale Kovarianz -> ?
-
-# for i in range(filteredLCamount):
-#     id = lightc_lst_filtered[i][0] 
-#     mag = lightc_lst_filtered[i][1] 
-#     t = lightc_lst_filtered[i][2] 
-#     try: #try-except-thing causes loop to continue when error occurs
-#         fitted_params, param_covariance = fit(theo, t, mag, p0 = [0.5, 150]) #input theo=Funktion, die gefittet werden soll, t=unabhängige Variable, a=Messwerte, p0 = initial guesses
-#         umin_fit = fitted_params[0]
-#         tE_fit = fitted_params[1]
-#         if (param_covariance[0] < maxcov) and (param_covariance[1] < maxcov):
-#             fittedlst.append([id, fitted_params, param_covariance])
-#             print("*** Parameters:", fitted_params,"*** Covariance:", param_covariance, "***")
-
-#     except:
-#         pass
