@@ -1,3 +1,4 @@
+# downloads and filters files right from the internet
 import pyarrow.parquet # um auf Parquet-File zuzugreifen
 import pandas # um auf Pandas-Dataframe zuzugreifen
 import numpy as np # Mathe
